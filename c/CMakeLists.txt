@@ -22,4 +22,4 @@ endif()
 target_link_libraries(newton PUBLIC Eigen3::Eigen)
 
 target_include_directories(newton PRIVATE inc/ src/)
-target_compile_options(newton PRIVATE -march=native -fconcepts )
+target_compile_options(newton PRIVATE -march=native  -O3)
