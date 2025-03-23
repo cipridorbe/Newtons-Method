@@ -1,4 +1,3 @@
-#pragma once
 #include "network.hpp"
 #include "Eigen/Dense"
 #include "types.hpp"
@@ -49,7 +48,7 @@ Network::Network(uint32_t layers, std::vector<uint32_t> layer_sizes,
     std::uniform_real_distribution<> dis(-1.0, 1.0);
     for (int i = 0; i < layers - 1; i++) {
         EigenMat current_weights(layer_sizes[i+1], layer_sizes[i]);
-        EigenMat current_biases(layer_sizes[i+1], layer_sizes[i]);
+        EigenVec current_biases(layer_sizes[i+1], layer_sizes[i]);
         for (int col = 0; col < current_weights.cols(); col++) {
             for (int row = 0; row < current_weights.rows(); row++) {
                 current_weights(row, col) = dis(gen);
@@ -58,6 +57,8 @@ Network::Network(uint32_t layers, std::vector<uint32_t> layer_sizes,
         for (int row = 0; row < current_biases.size(); row++) {
             current_biases[row] = dis(gen);
         }
+        this->weights.push_back(current_weights);
+        this->biases.push_back(current_biases);
     }
 }
 
