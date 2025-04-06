@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models, utils
-from tensorflow.keras.optimizers import Optimizer
+from tensorflow.keras.optimizers import Adam
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -29,11 +29,8 @@ model = models.Sequential([
     layers.Dense(10, activation='softmax')                    # Output layer for 10 classes
 ])
 
-# Instantiate your custom optimizer
-custom_optimizer = CustomOptimizer(learning_rate=0.01)
-
-# Compile the model using the custom optimizer and categorical crossentropy loss
-model.compile(optimizer=Optimizer,
+# Compile the model using an actual optimizer instance
+model.compile(optimizer=Adam(learning_rate=0.001),  # Correct optimizer usage
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
