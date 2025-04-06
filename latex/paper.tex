@@ -1,14 +1,107 @@
 \documentclass{article}
-\usepackage{amsmath,amssymb}
-\usepackage{graphicx}
-\usepackage{enumitem}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
 \usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{graphicx}
+
 \geometry{legalpaper, portrait, margin=.5in}
+
 \title{CS 2051 Group Project}
 \author{Ibrahim Ahmad, Cipriano Dorbessan, Christopher Gossmann}
-\date{March 2025}
+\date{April 2025}
 
 \begin{document}
 
 \maketitle
+
+\section*{Project Outline}
+Our project is focused on using Newton’s method (also known as the Newton-Raphson method) as the optimizer for machine learning. We will use \LaTeX{} to make our research paper. Since our project involves a significant amount of coding, we created a GitHub where we will keep our code: \url{https://github.com/cipridorbe/Newtons-Method}
+
+\section*{Background Knowledge}
+
+\subsection*{Newton’s Method}
+Newton’s method is an iterative root-finding algorithm for functions. For a single variable function \( f: \mathbb{R} \to \mathbb{R} \), the algorithm starts with an initial guess \( x_0 \), and the next term \( x_1 \) is found by using the tangent line at \( x_0 \).
+
+The tangent through \( (x_0, f(x_0)) \) with slope \( f'(x_0) \) is given by:
+\[
+y - f(x_0) = f'(x_0)(x - x_0)
+\]
+Solving \( y = 0 \), we get:
+\[
+x = x_0 - \frac{f(x_0)}{f'(x_0)}
+\]
+So the formula for the \(n\)-th term is:
+\[
+x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}
+\]
+
+In machine learning, we aim to find the minimum of a function, not its root. Since the minimum occurs when \( f'(x) = 0 \), we can use Newton’s method to find the minimum:
+\[
+x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}
+\]
+
+For multivariate functions \( f: \mathbb{R}^k \to \mathbb{R} \), we generalize the derivative to the gradient and the second derivative to the Hessian matrix. Thus, the update formula becomes:
+\[
+x_{n+1} = x_n - [\nabla^2 f(x_n)]^{-1} \nabla f(x_n)
+\]
+Where \( x_n, x_{n+1}, \nabla f(x_n) \in \mathbb{R}^k \), and \( \nabla^2 f(x_n) \in \mathbb{R}^{k \times k} \).
+
+Computing the inverse of the Hessian matrix is expensive. Instead, we solve the linear system:
+\[
+[\nabla^2 f(x_n)] h = -\nabla f(x_n)
+\]
+Which gives \( h = -[\nabla^2 f(x_n)]^{-1} \nabla f(x_n) \).
+
+\section*{Differentiation}
+To compute derivatives, we can use:
+
+\begin{itemize}
+    \item \textbf{Finite differencing:} Simple to implement but computationally expensive when \( f''(x_n) \) is needed many times.
+    \item \textbf{Automatic differentiation:} Builds a computational graph to calculate derivatives. It is complex to implement but more efficient in higher-order systems.
+\end{itemize}
+
+\section*{Method and Complexity in Machine Learning}
+To apply Newton’s method in machine learning, we require:
+\begin{itemize}
+    \item An initial guess (often random).
+    \item A tolerance for convergence.
+    \item A maximum number of iterations.
+\end{itemize}
+
+Newton’s method converges quadratically near the solution — each iteration roughly doubles the number of correct digits. However, poor initial guesses may lead to slow convergence or divergence. The function must have continuous first and second derivatives.
+
+Performance also depends on the function shape. Linear first derivatives tend to lead to faster convergence.
+
+Although Newton’s method has a quadratic convergence rate, it can have greater complexity than other optimization algorithms due to:
+
+\begin{itemize}
+    \item Gradient computation: \( \mathcal{O}(n) \)
+    \item Hessian computation: \( \mathcal{O}(n^2) \)
+    \item Solving linear systems: \( \mathcal{O}(n^3) \) (for dense matrices)
+\end{itemize}
+
+The number of iterations varies depending on the tolerance, curvature, and initial guess.
+
+\section*{Conclusion}
+We have not yet implemented and benchmarked these algorithms, so the efficiency remains unknown.
+
+\section*{Extensions and Applications}
+Potential extensions:
+\begin{itemize}
+    \item Apply Newton’s method to other domains: physics engines, architectural design, etc.
+    \item Use in other machine learning fields: unsupervised or reinforcement learning.
+    \item Explore other optimization algorithms, including derivative-free methods.
+\end{itemize}
+
+If results are promising, we aim to test on larger networks and frameworks.
+
+\section*{References}
+\begin{enumerate}
+    \item Wikipedia, “Newton’s method.” \url{https://en.wikipedia.org/wiki/Newton%27s_method}
+    \item GeeksforGeeks, “Newton’s method in machine learning.” \url{https://www.geeksforgeeks.org/newtons-method-in-machine-learning/}
+    \item Wikipedia, “Automatic differentiation.” \url{https://en.wikipedia.org/wiki/Automatic_differentiation}
+\end{enumerate}
+
 \end{document}
