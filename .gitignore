@@ -4,3 +4,6 @@ c/build/
 *.pdf
 *.aux
 *.log
+*.bbl
+*.blg
+*.out
