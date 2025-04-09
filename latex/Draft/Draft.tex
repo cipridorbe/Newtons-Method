@@ -10,10 +10,10 @@
 \usepackage[version=4]{mhchem}
 \usepackage{stmaryrd}
 
-\title{Optimizing Newton's Method for Machine Learning }
+\title{Newton's Method in Machine Learning }
 
-\author{}
-\date{}
+\author{Ibrahim Ahmad, Cipriano Dorbessan, Christopher Gossmann}
+\date{April 2025}
 
 
 \begin{document}
@@ -27,8 +27,43 @@ Once we had a working implementation, we compared the performance of our Newton-
 
 This outcome shows that using Newton's Method for machine learning is possible, but might not be ideal. While it also uses the second-order derivative to converge, it is made worse because of the computational complexity of calculating the Hessian matrix-especially in higher dimensions. However, this project can serve as insight on the potential challenges of incorporating second-order optimization techniques into neural network training.
 
-\section*{Newton's method in optimization}
-Missing text goes here
+\section*{Proofs}
+There are a few nontrivial statements that are crucial for understanding Numerical Optimization and training Neural Networks.
+\subsection*{Proof Of Taylor's Theorem}
+Taylor's Theorem is cruicial for doing numerical optimization. It allows us to provide an approximation of a function in the open neighbourhood of a point.
+
+We must prove Taylor's theorem for the high dimensional case. We shall do so directly.
+Let $f : \mathbb{R}^n \mapsto \mathbb{R}$. We shall observe some properties of $f$ in the region of $A$, where $A$ is an open subset of $\mathbb{R}^n$. We shall make the following assumptions: $f$ is continuous on $A$, $f$ is differentiable on $A$. (Note: We do not contain the boundary points as this allows us to handle asymptotics more neatly). 
+Let us define the derivative of $f$ in the direction of $\alpha$ by writing \begin{equation}\vec{\alpha} \cdot \vec{\nabla} f(\vec{x}) = \lim_{t \to 0}\frac{f(\vec{x} + \vec{\alpha}t) - f(\vec{x})}{t}\end{equation}, under the assumption that $\vec{x} + t \vec{\alpha} \in A$. This allows us to find the derivative in any direction from the location of $x$. Let us define $\Phi(t) = f(\vec{x} + \vec{\alpha} t)$. Because $\Phi : \mathbb{R} \mapsto \mathbb{R}$
+we can use Taylor's theorem on $\Phi$. This lets us write the equivalency 
+\begin{equation}\Phi(t) = \Phi(0) + \Phi'(0)t + \Phi''(0)\frac{t^2}{2} + \dots\end{equation}
+By substituting the definition of $\Phi(t)$ into both sides, we can write 
+\begin{equation} f(\vec{x} + t \cdot \vec{\alpha}) = \Phi(0) + \Phi'(0)t + \Phi''(0)\frac{t^2}{2} + \dots\end{equation}
+We also know that 
+\begin{equation}\Phi(t)' = \lim_{t \to 0}\frac{f(\vec{x} + \vec{\alpha}t) - f(\vec{x})}{t} = \vec{\alpha} \cdot \vec{\nabla}f(\vec{x})\end{equation}
+By the definition of $\Phi$, and $\vec{\alpha} \cdot \vec{\nabla}$.
+By substituting into both sides, we get the following. For convenience, we shorten $\vec{\alpha}\cdot\vec{\nabla}$ to $\vec{\nabla}$.
+\begin{equation} f(\vec{x} + t \cdot \vec{\alpha}) = f(\vec{x}) + [\vec{\nabla}f(\vec{x})]^T\vec{\alpha} t + \frac{1}{2}\vec{\alpha}^T[\vec{\nabla}^2f(\vec{x})]\vec{\alpha} \cdot t^2 + \dots\end{equation}
+We shall only use first and second order methods, so we have not shown the third order term of the Taylor Series, which requires rank 3 tensor multiplications.
+Thus we have proved Taylor's Theorem for functions $f : \mathbb{R}^n \mapsto \mathbb{R}$, under an open subset of $\mathbb{R}^n$.
+
+
+\subsection*{Convergence Of Gradient Descent}
+While we do not use Gradient Descent to train any of the models, understanding Gradient Descent and it's properties is crucial to understanding Adam, Stochastic Gradient Descent, and Newton's Method. For further reading regarding these algorithms we reccomend \cite{garrigos_2023_handbook}.
+
+Because the Neural Network is not L-Smooth, or Convex, we must show the convergence of Gradient Descent under minimal assumptions. Let $x_k$ be the value of the descent's algorithm's value at the $k$'th iteration. We shall use the following update rule $x_{k+1} = x_k - \eta_k\vec{\nabla}f(x_k)$.
+
+
+By the mean value theorem, we know that $f(\vec{x_{k+1}}) = f(\vec{x_k}) - \eta \|\vec{\nabla}f(x_k)\|^2 + o(\eta\|\vec{\nabla}f(\vec{x_k}\|^2)$. The proof of the $o$ term is complex and not useful for what we intend to do. It can be imagined as an upper bound of the remainder of the Taylor approximation $f(x_{k+1})$ after the first term. If $\eta_k$ is sufficently small, we can write $f(x_{k+1}) \leq f(x_k) - \eta_k \|\vec{\nabla}f(x_k)\|^2$. We must make the assumption that $\eta_k$ is sufficently small, as without that assumption we may overshoot the point we intend on converging to. We note, that under these assumptions $f(x_{k+1}) < f(x_k)$ if $\eta_k \|\vec{\nabla}f(x_k)\|^2$ is nonzero, and $f(x_{k+1}) = f(x_k)$ if $\eta_k \|\vec{\nabla}f(x_k)\|^2$ is zero. Thus we have shown that the function values are decreasing, and the algorithm converges at a minima or saddle point if $f$ is lower bounded.
+
+We note that $\lim_{k \to \infty} \|\vec{\nabla}\| = 0$, as that is the state the algorithm must converge to to be considered to have converged.
+We also know that $\eta_k > 0$, as if $\eta_k = 0$, then the algorithm would not converge.
+
+\subsection*{Convergence Of Other Descent Algorithms}
+
+We shall now study the convergence of algorithms of the following form $x_{k+1} = x_k - S_k\vec{\nabla}f(x_k)$. The constraints we place are that $S_k\vec{\nabla}f(x_k)$ is sufficiently small as to not overshoot the extrema, and that $S_k$ is a positive definite matrix. For example, Newton's method chooses $S_k = \vec{\nabla}^{-2}f(x_k)$.
+
+Algorithms that follow this form are guarunteed to converge to a minima such that $\vec{\nabla}f(x_k) = 0$. Recall the following property of positive definite matrices, for some arbitrary vector $\vec{v}$, $\vec{v}^TS\vec{v} > 0$. In other words, when multiplying the matrix $S$ by some vector, that vector is rotated by less than $90^{\circ}$. Thus we know that $(S_k\vec{\nabla}f(x_k)) \cdot \vec{\nabla}f(x_k) > 0$. Let us now project $S_k\vec{\nabla}f(x_k)$ onto $\vec{\nabla}f(x_k)$, yielding $d_k$. Because $S_k$ is semi definite, we know that $d_k$ is nonzero and $d_k \cdot ,\vec{\nabla}f(x_k)$ or in other words, $S_k$ transforms the gradient vector such that it no longer faces the direction of steepest descent, but it still faces a direction of descent. Because the projection in the descent direction is a nonzero positive scaled version of the gradient, the descent can be considered to be similar to that of gradient descent with a different stepsize.
 
 \section*{Network model}
 We used Tensorflow with Keras to build our network model. The dataset we used was "Pen-Based Recognition of Handwritten Digits" which consists of 8x8 images of handwritten digits. Our network consists of an input layer of 64 neurons (one for each pixel), a hidden layer of 32 neurons with ReLU as their activation function, and an output layer of 10 neurons (one for each digit) with softmax as the activation. For the ADAM and SGD optimizers, we used Keras' built-in optimizers. We wrote the Newton's Method optimizer ourselves using Keras' automatic differentiation (through the use of Gradient Tapes and the built-in Jacobian method). The Adam and SGD models were trained using Tensorflow's fit method, and the Newton's method model was trained using our own train function, as there was no pre-existing function to do this. When analyzing the results, it is important to take into account that the networks using ADAM and SGD will have a slight advantage over the network using our custom Newton's Method optimizer, as the code for these two optimizers was written and optimized by Tensorflow developers over many years.
@@ -52,6 +87,7 @@ Once again, the performance of the Newton's Method optimizer was heavily impacte
 
 Other extensions include using Newton's Method in other machine learning contexts, such as non-classification neural networks such as regression, or even in unsupervised or reinforcement learning. Another possible extension is the use of other optimization algorithms to train networks, such as derivative-free algorithms. We could also use Newton's Method in other contexts, such as in symbolic calculators.
 
-\section*{References}
+\bibliographystyle{IEEEtran}
+\bibliography{main}
 
 \end{document}
